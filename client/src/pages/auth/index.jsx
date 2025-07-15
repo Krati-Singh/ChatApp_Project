@@ -6,14 +6,35 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button" 
 import { toast } from "sonner";
 import { SIGNUP_ROUTE } from "@/utils/constants";
+import {LOGIN_ROUTE} from "@/utils/constants"
 import apiClient from '@/lib/api-client';
+import { useNavigate } from 'react-router-dom';
+import useAppStore from "../../store/index.js";
 
 
 const Auth = () => {
+  const Navigate = useNavigate("")
+  const { setUserInfo } = useAppStore();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
+  const validateLogin = () => {
+    if(!email.length){
+      alert(email.length);
+      toast.error("Email is required.");
+      return false;
+    }
+    if(!email.length){
+      toast.error("Email is required.");
+      return false;
+    }
+    if(!password.length){
+      toast.error("Password is required.");
+      return false;
+    }
+    return true;
+  };
   const validateSignup = () => {
     if(!email.length){
       alert(email.length);
@@ -35,13 +56,32 @@ const Auth = () => {
     return true;
   };
 
-  const handleLogin = async() => {}
+  const handleLogin = async() => {
+    if(validateLogin()){
+      const response = await apiClient.post("/api/auth/login", {email, password},{withCredentials: true});
+      console.log({response});
+      if(response.data.user.id) {
+        setUserInfo(response.data.user);
+        if(response.data.user.profileSetup){
+          Navigate("/chat"); 
+        }
+        else{
+          Navigate("/profile");
+        }
+      }
+    }
+  };
   const handleSignup = async() => {
     if(validateSignup()){
-      const response = await apiClient.post("/api/auth/signup", {email, password});
+      const response = await apiClient.post("/api/auth/signup", {email, password},{withCredentials: true});
+      console.log({response});
+      if(response.status === 201){
+        setUserInfo(response.data.user);
+        toast.success("Signup successful.");
+        Navigate("/profile");
+      }
     }
-    
-  }
+  };
  
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-pink-200">
@@ -54,7 +94,7 @@ const Auth = () => {
           <p className="text-1xl font-weight:500 text-center">Fill in the details to get started & yap non-stop!</p>
         </div>
         <div className="flex items-center justify-center w-full">
-          <Tabs className="w-3/4">
+          <Tabs className="w-3/4" defaultValue='login'>
             <TabsList className="bg-transparent rounded-none w-full">
               <TabsTrigger 
                 value="login"
@@ -115,6 +155,6 @@ const Auth = () => {
         </div>
     </div>
   )
-}
+};
 
 export default Auth

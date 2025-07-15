@@ -21,9 +21,10 @@ mongoose
     .catch((err) => console.log(err.message));
 
 app.use(cors({
-    origin: process.env.ORIGIN,
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200,
 }));
 app.use(cookieParser());
 app.use(express.json());
