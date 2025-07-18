@@ -13,7 +13,7 @@ import useAppStore from "../../store/index.js";
 
 
 const Auth = () => {
-  const Navigate = useNavigate("")
+  const navigate = useNavigate("")
   const { setUserInfo } = useAppStore();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -63,10 +63,10 @@ const Auth = () => {
       if(response.data.user.id) {
         setUserInfo(response.data.user);
         if(response.data.user.profileSetup){
-          Navigate("/chat"); 
+          navigate("/chat"); 
         }
         else{
-          Navigate("/profile");
+          navigate("/profile");
         }
       }
     }
@@ -74,11 +74,11 @@ const Auth = () => {
   const handleSignup = async() => {
     if(validateSignup()){
       const response = await apiClient.post("/api/auth/signup", {email, password},{withCredentials: true});
-      console.log({response});
+      console.log(response.data.userData);
       if(response.status === 201){
         setUserInfo(response.data.user);
         toast.success("Signup successful.");
-        Navigate("/profile");
+        navigate("/profile");
       }
     }
   };

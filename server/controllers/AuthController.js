@@ -21,11 +21,9 @@ export const signup = async (request, response, next) => {
             sameSite: "Lax", 
     });
         return response.status(201).json({
-            user:{
                 id:user.id,
                 email:user.email,
                 profileSetup:user.profileSetup,
-            },
         });
     }
     catch (error) {
@@ -80,7 +78,6 @@ export const getUserInfo = async (request, response, next) => {
             return response.status(404).send("User with this mail id does not exists.")
         }
        return response.status(200).json({
-            userData:{
                 id:userData.id,
                 email:userData.email,
                 profileSetup:userData.profileSetup,
@@ -88,7 +85,6 @@ export const getUserInfo = async (request, response, next) => {
                 lastName:userData.lastName,
                 image:userData.image,
                 color:userData.color
-            },
         }); 
     } 
     catch (error) {
@@ -96,5 +92,40 @@ export const getUserInfo = async (request, response, next) => {
         return response.status(500).send("Internal Server Error")
     }
 };
+
+export const updateProfile = async (request, response, next) => {
+    try {
+        const { userId } = request;
+        const {firstName, lastName, color} = request.body;
+        if(!firstName || !lastName || !color) {
+            return response.status(400).send("FirstName, LastName and color is required.")
+        }
+        const userData = await User.findByIdAndUpdate(
+            userId,
+             {
+                firstName,
+                lastName,
+                color,
+                profileSetup:true
+        },
+        {new:true, runValidators: true}
+      );
+        
+       return response.status(200).json({
+                id:userData.id,
+                email:userData.email,
+                profileSetup:userData.profileSetup,
+                firstName:userData.firstName,
+                lastName:userData.lastName,
+                image:userData.image,
+                color:userData.color
+        }); 
+    } 
+    catch (error) {
+        console.log({error});
+        return response.status(500).send("Internal Server Error")
+    }
+};
+  
      
     
